@@ -14,8 +14,21 @@ class Game:
         self.game_state = X_PLAYING
 
     def print_board(self):
-        for row in self.board:
-            print(row)
+        print("---")
+        print("  0 1 2")
+        for i in range(3):
+            el_1 = self.board[i][0]
+            if self.board[i][0] is None:
+                el_1 = "-"
+            el_2 = self.board[i][1]
+            if self.board[i][1] is None:
+                el_2 = "-"
+            el_3 = self.board[i][2]
+            if self.board[i][2] is None:
+                el_3 = "-"
+
+            print(f"{i} {el_1} {el_2} {el_3}")
+        print("---")
 
     def move(self, x, y):
         if not (self.game_state == X_PLAYING or self.game_state == O_PLAYING):
@@ -92,3 +105,6 @@ class Game:
                     possible_move.append((x, y))
 
         return possible_move
+
+    def is_ending_state(self):
+        return self.game_state == X_WON or self.game_state == O_WON or self.game_state == DRAW

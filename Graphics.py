@@ -108,7 +108,7 @@ class Graphics:
                     pg.quit()
                     sys.exit()
                 if event.type == MOUSEBUTTONDOWN:
-                    if self.game.game_state == X_WON or self.game.game_state == O_WON or self.game.game_state == DRAW:
+                    if self.game.is_ending_state():
                         self.reset()
 
                     else:
