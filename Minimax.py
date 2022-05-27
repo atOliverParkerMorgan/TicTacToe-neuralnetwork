@@ -1,4 +1,4 @@
-from Game import Game, O_WON, X_WON, DRAW, X_PLAYING, O_PLAYING, VALID_MOVE
+from Game import O_WON, X_WON, X_PLAYING, O_PLAYING
 import copy
 
 WIN_STATE_BONUS = 1_000_000

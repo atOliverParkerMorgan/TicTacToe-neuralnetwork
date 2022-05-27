@@ -1,6 +1,7 @@
 from Graphics import Graphics
 from Game import Game, INVALID_MOVE
 from Minimax import get_best_move
+from NeuralNet import generate_model, visualize_nn
 
 
 def play(game):
@@ -39,8 +40,10 @@ def play(game):
 
 
 if __name__ == "__main__":
-    graphics = Graphics(400, 400)
-    graphics.game_initiating_window()
-    graphics.game_loop()
-    # game = Game()
-    # play(game)
+    # graphics = Graphics(400, 400)
+    # graphics.game_initiating_window()
+    # graphics.game_loop()
+    model = generate_model(9, 9)
+    visualize_nn(model)
+    current_game = Game()
+    play(current_game)

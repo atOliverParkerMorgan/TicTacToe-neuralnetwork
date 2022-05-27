@@ -2,7 +2,7 @@ import pygame as pg
 import sys
 import time
 from pygame.locals import *
-from Game import Game, O_WON, X_WON, DRAW, X_PLAYING, O_PLAYING, VALID_MOVE
+from Game import Game, VALID_MOVE
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
