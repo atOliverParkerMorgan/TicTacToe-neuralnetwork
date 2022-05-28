@@ -39,16 +39,21 @@ def play(game):
             break
 
 
+def train_and_save_model(location, training_data_location):
+    model = generate_model(9, [12, 14, 14, 12], 9)
+    visualize_nn(model)
+    model = compile_model(model)
+    model = train(model, training_data_location, 300, 32)
+    model.summary()
+    model.save(location)
+
+
 if __name__ == "__main__":
     # graphics = Graphics(400, 400)
     # graphics.game_initiating_window()
     # graphics.game_loop()
-    model = generate_model(9, [12, 14, 14, 12], 9)
-    visualize_nn(model)
-    model = compile_model(model)
-    model = train(model, "O_training_data.txt", 300, 32)
-    model.summary()
-    model.save("./")
+    train_and_save_model("./O_model/", "O_training_data.txt")
+    # train_and_save_model("./X_model/", "X_training_data.txt")
     # current_game = Game()
     # generate_training_data(20_000, True, "w")
     # generate_training_data(20_000, False, "w")
