@@ -1,6 +1,90 @@
-from keras import models, layers, utils, backend as K
+import random
+from keras import models, layers, backend as K
 import matplotlib.pyplot as plt
-import shap
+import Minimax
+from Game import Game
+
+
+def get_random_game_state_and_next_best_move(is_O):
+    game = Game()
+
+    O_moves = [1, 3, 5, 7]
+    X_moves = [0, 2, 4, 6, 8]
+
+    moves = X_moves
+    if is_O:
+        moves = O_moves
+
+    random_index = random.randint(0, len(moves) - 1)
+    # get random board position by playing random moves
+    # if game is ending state redo the process since there is no go good next move in such a state
+    while True:
+        not_end_state = True
+        for i in range(moves[random_index]):
+            possible_moves = game.get_possible_moves()
+            random_move = possible_moves[random.randint(0, len(possible_moves) - 1)]
+            game.move(random_move[0], random_move[1])
+            if game.is_ending_state():
+                game = Game()
+                not_end_state = False
+                break
+
+        if not_end_state:
+            break
+
+    best_move = Minimax.get_best_move(game)
+    best_output = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    best_output[(best_move[0] + 3 * best_move[1])] = 1
+
+    return game.get_board_value(), best_output
+
+
+def generate_training_data(size, is_O, command):
+    name = "X_training_data.txt"
+    if is_O:
+        name = "O_training_data.txt"
+
+    if not (command == "a" or command == "w"):
+        print("Error, command can only be 'w' or 'a' ")
+        return
+
+    f = open(name, command)
+    for i in range(size):
+        print(f"{i} of {size}")
+        f.write((str(get_random_game_state_and_next_best_move(is_O))[1:-1]) + "\n")
+    f.close()
+
+
+def train(model):
+    # train/validation
+    X, y = 0, 0
+    training = model.fit(x=X, y=y, batch_size=32, epochs=100, shuffle=True, verbose=0, validation_split=0.3)
+
+    # plot
+    metrics = [k for k in training.history.keys() if ("loss" not in k) and ("val" not in k)]
+    fig, ax = plt.subplots(nrows=1, ncols=2, sharey=True, figsize=(15, 3))
+
+    # training
+    ax[0].set(title="Training")
+    ax11 = ax[0].twinx()
+    ax[0].plot(training.history['loss'], color='black')
+    ax[0].set_xlabel('Epochs')
+    ax[0].set_ylabel('Loss', color='black')
+    for metric in metrics:
+        ax11.plot(training.history[metric], label=metric)
+        ax11.set_ylabel("Score", color='steelblue')
+    ax11.legend()
+
+    # validation
+    ax[1].set(title="Validation")
+    ax22 = ax[1].twinx()
+    ax[1].plot(training.history['val_loss'], color='black')
+    ax[1].set_xlabel('Epochs')
+    ax[1].set_ylabel('Loss', color='black')
+    for metric in metrics:
+        ax22.plot(training.history['val_' + metric], label=metric)
+        ax22.set_ylabel("Score", color="steelblue")
+    plt.show()
 
 
 def compile_model(model):

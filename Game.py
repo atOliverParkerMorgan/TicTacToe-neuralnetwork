@@ -108,3 +108,14 @@ class Game:
 
     def is_ending_state(self):
         return self.game_state == X_WON or self.game_state == O_WON or self.game_state == DRAW
+
+    def get_board_value(self):
+        value_board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+        for y in range(3):
+            for x in range(3):
+                if self.board[y][x] == "X":
+                    value_board[x + 3 * y] = 1
+                elif self.board[y][x] == "O":
+                    value_board[x + 3 * y] = -1
+
+        return value_board
