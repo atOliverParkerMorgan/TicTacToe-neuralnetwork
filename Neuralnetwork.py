@@ -1,4 +1,7 @@
 import random
+import ast
+
+import numpy
 from keras import models, layers, backend as K
 import matplotlib.pyplot as plt
 import Minimax
@@ -55,10 +58,18 @@ def generate_training_data(size, is_O, command):
     f.close()
 
 
-def train(model):
-    # train/validation
-    X, y = 0, 0
-    training = model.fit(x=X, y=y, batch_size=32, epochs=100, shuffle=True, verbose=0, validation_split=0.3)
+def train(model, train_data_file, epochs, batch_size):
+    input_data = []
+    output_data = []
+
+    with open(train_data_file) as file:
+        for line in file:
+            data = ast.literal_eval(line.rstrip())
+            input_data.append(data[0])
+            output_data.append(data[1])
+
+    training = model.fit(x=numpy.array(input_data), y=numpy.array(output_data), batch_size=batch_size, epochs=epochs, shuffle=True, verbose=0,
+                         validation_split=0.3)
 
     # plot
     metrics = [k for k in training.history.keys() if ("loss" not in k) and ("val" not in k)]
@@ -86,6 +97,8 @@ def train(model):
         ax22.set_ylabel("Score", color="steelblue")
     plt.show()
 
+    return model
+
 
 def compile_model(model):
     def Recall(y_true, y_pred):
@@ -106,30 +119,30 @@ def compile_model(model):
         return 2 * ((precision * recall) / (precision + recall + K.epsilon()))
 
     # compile the neural network
-    return model.compile(optimizer='adam', loss='binary_crossentropy',
-                         metrics=['accuracy', F1])
+    model.compile(optimizer='adam', loss='binary_crossentropy',
+                  metrics=['accuracy', F1])
+
+    return model
 
 
-def generate_model(number_of_inputs, number_of_outputs):
+def generate_model(number_of_inputs, number_of_nodes_in_layers, number_of_outputs):
     # DeepNN
 
     # layer input
     inputs = layers.Input(name="input", shape=(number_of_inputs,))
 
-    # hidden layer 1
-    h1 = layers.Dense(name="h1", units=int(round((number_of_inputs + 1) / 2)), activation='relu')(inputs)
-    h1 = layers.Dropout(name="drop1", rate=0.2)(h1)
-
-    # hidden layer 2
-    h2 = layers.Dense(name="h2", units=int(round((number_of_inputs + 1) / 4)), activation='relu')(h1)
-    h2 = layers.Dropout(name="drop2", rate=0.2)(h2)
+    last_layer = inputs
+    for i, number_of_nodes in enumerate(number_of_nodes_in_layers):
+        # hidden layer 1
+        current_layer = layers.Dense(name=f"h{i}", units=number_of_nodes, activation='relu')(last_layer)
+        current_layer = layers.Dropout(name=f"drop{i}", rate=0.2)(current_layer)
+        last_layer = current_layer
 
     # layer output
-    outputs = layers.Dense(name="output", units=number_of_outputs, activation='sigmoid')(h2)
+    outputs = layers.Dense(name="output", units=number_of_outputs, activation='sigmoid')(last_layer)
     model = models.Model(inputs=inputs, outputs=outputs, name="DeepNN")
-    model.summary()
 
-    return model
+    return models.Model(inputs=inputs, outputs=outputs, name="DeepNN")
 
 
 def utils_nn_config(model):
