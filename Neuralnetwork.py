@@ -2,7 +2,7 @@ import random
 import ast
 
 import numpy
-from keras import models, layers, backend as K
+from keras import models, layers
 import matplotlib.pyplot as plt
 import Minimax
 from Game import Game
@@ -58,6 +58,15 @@ def generate_training_data(size, is_O, command):
     f.close()
 
 
+def train_and_save_model(location, training_data_location):
+    model = generate_model(9, [12, 14, 14, 12], 9)
+    visualize_nn(model)
+    model = compile_model(model)
+    model = train(model, training_data_location, 300, 32)
+    model.summary()
+    model.save(location)
+
+
 def train(model, train_data_file, epochs, batch_size):
     input_data = []
     output_data = []
@@ -68,12 +77,23 @@ def train(model, train_data_file, epochs, batch_size):
             input_data.append(data[0])
             output_data.append(data[1])
 
-    training = model.fit(x=numpy.array(input_data), y=numpy.array(output_data), batch_size=batch_size, epochs=epochs, shuffle=True, verbose=0,
+    X = numpy.array(input_data)
+    y = numpy.array(output_data)
+    # Train and test data split
+    boundary = int(0.8 * len(X))
+    X_train = X[:boundary]
+    X_test = X[boundary:]
+    y_train = y[:boundary]
+    y_test = y[boundary:]
+    training = model.fit(x=X_train, y=y_train,
+                         validation_data=(X_test, y_test),
+                         batch_size=batch_size, epochs=epochs,
+                         shuffle=True, verbose=0,
                          validation_split=0.3)
 
     # plot
     metrics = [k for k in training.history.keys() if ("loss" not in k) and ("val" not in k)]
-    fig, ax = plt.subplots(nrows=1, ncols=2, sharey=True, figsize=(15, 3))
+    fig, ax = plt.subplots(nrows=1, ncols=2, sharey="True", figsize=(15, 3))
 
     # training
     ax[0].set(title="Training")
@@ -100,27 +120,22 @@ def train(model, train_data_file, epochs, batch_size):
     return model
 
 
+def get_best_move(model, game):
+    board_values = game.get_board_value()
+    outputs = model.predict(numpy.array(board_values).reshape(-1, 9))[0]
+
+    best_output, best_index = outputs[0], 0
+    for index, output in enumerate(outputs):
+        if output > best_output and board_values[index] == 0:
+            best_output = output
+            best_index = index
+
+    return best_index % 3, int(best_index / 3)
+
+
 def compile_model(model):
-    def Recall(y_true, y_pred):
-        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-        possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
-        recall = true_positives / (possible_positives + K.epsilon())
-        return recall
-
-    def Precision(y_true, y_pred):
-        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-        predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
-        precision = true_positives / (predicted_positives + K.epsilon())
-        return precision
-
-    def F1(y_true, y_pred):
-        precision = Precision(y_true, y_pred)
-        recall = Recall(y_true, y_pred)
-        return 2 * ((precision * recall) / (precision + recall + K.epsilon()))
-
     # compile the neural network
-    model.compile(optimizer='adam', loss='binary_crossentropy',
-                  metrics=['accuracy', F1])
+    model.compile(loss='categorical_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
 
     return model
 
@@ -140,7 +155,6 @@ def generate_model(number_of_inputs, number_of_nodes_in_layers, number_of_output
 
     # layer output
     outputs = layers.Dense(name="output", units=number_of_outputs, activation='sigmoid')(last_layer)
-    model = models.Model(inputs=inputs, outputs=outputs, name="DeepNN")
 
     return models.Model(inputs=inputs, outputs=outputs, name="DeepNN")
 
@@ -158,7 +172,7 @@ def utils_nn_config(model):
                          "out": int(layer.output.shape[-1]), "activation": layer.get_config()["activation"],
                          "params": layer.get_weights()[0], "bias": layer.get_weights()[1]}
 
-        except:
+        except ValueError:
             dic_layer = {"name": layer.name, "in": int(layer.input.shape[-1]), "neurons": 0,
                          "out": int(layer.output.shape[-1]), "activation": None,
                          "params": 0, "bias": 0}

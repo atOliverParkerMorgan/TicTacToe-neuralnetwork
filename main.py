@@ -1,10 +1,14 @@
 from Graphics import Graphics
-from Game import Game, INVALID_MOVE
-from Minimax import get_best_move
-from Neuralnetwork import generate_model, visualize_nn, generate_training_data, train, compile_model
+from Game import Game, INVALID_MOVE, X_PLAYING, O_PLAYING
+from tensorflow import keras
+import Minimax
+import Neuralnetwork
+
+global model_X
+global model_O
 
 
-def play(game):
+def play(game, ai):
     def check_game_state(game_):
         print(game_.game_state)
 
@@ -27,34 +31,52 @@ def play(game):
 
         if check_game_state(game):
             break
+        if ai == "minimax":
+            best_move = Minimax.get_best_move(game)
 
-        best_move = get_best_move(game)
+            game.move(best_move[0], best_move[1])
 
-        game.move(best_move[0], best_move[1])
+            print(best_move)
 
-        print(best_move)
+            game.print_board()
+            if check_game_state(game):
+                break
 
-        game.print_board()
-        if check_game_state(game):
-            break
+        elif ai == "neuralnetwork":
+            model = model_O
+            if game.game_state == X_PLAYING:
+                model = model_X
 
+            best_move = Neuralnetwork.get_best_move(model, game)
 
-def train_and_save_model(location, training_data_location):
-    model = generate_model(9, [12, 14, 14, 12], 9)
-    visualize_nn(model)
-    model = compile_model(model)
-    model = train(model, training_data_location, 300, 32)
-    model.summary()
-    model.save(location)
+            game.move(best_move[0], best_move[1])
+
+            print(best_move)
+
+            game.print_board()
+            if check_game_state(game):
+                break
 
 
 if __name__ == "__main__":
-    # graphics = Graphics(400, 400)
-    # graphics.game_initiating_window()
-    # graphics.game_loop()
-    train_and_save_model("./O_model/", "O_training_data.txt")
-    # train_and_save_model("./X_model/", "X_training_data.txt")
+    # load models
+    model_O = keras.models.load_model('./O_model')
+    model_X = keras.models.load_model('./X_model')
+
+    # play console game
     # current_game = Game()
+    # play(current_game, 'minimax')
+    # or
+    # play(current_game, 'neuralnetwork')
+
+    # play with UI
+    graphics = Graphics(600, 600)
+    graphics.game_loop(model_O, model_X)
+
+    # train neural network
+    # train_and_save_model("./X_model/", "X_training_data.txt")
+    # train_and_save_model("./O_model/", "O_training_data.txt")
+
+    # generate training data
     # generate_training_data(20_000, True, "w")
     # generate_training_data(20_000, False, "w")
-    # play(current_game)

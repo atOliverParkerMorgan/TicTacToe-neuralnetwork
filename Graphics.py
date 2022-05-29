@@ -1,8 +1,14 @@
-import pygame as pg
 import sys
 import time
+
+import pygame as pg
+import pygame_menu
 from pygame.locals import *
-from Game import Game, VALID_MOVE
+from pygame_menu.examples import create_example_window
+
+import Minimax
+import Neuralnetwork
+from Game import Game, VALID_MOVE, O_PLAYING, X_PLAYING
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -31,6 +37,12 @@ class Graphics:
         self.initiating_window = pg.transform.scale(initiating_window, (width, height + 100))
         self.x_img = pg.transform.scale(x_img, (80, 80))
         self.o_img = pg.transform.scale(o_img, (80, 80))
+
+        self.ai = None
+        self.ai_player = None
+        self.menu = None
+        self.model_O = None
+        self.model_X = None
 
         self.game = Game()
 
@@ -62,8 +74,8 @@ class Graphics:
 
         text = font.render(message, True, (255, 255, 255))
 
-        self.screen.fill((0, 0, 0), (0, 400, 500, 100))
-        text_rect = text.get_rect(center=(self.width / 2, 500 - 50))
+        self.screen.fill((0, 0, 0), (0, self.width, self.height+100, 100))
+        text_rect = text.get_rect(center=(self.width / 2, self.height - 50))
         self.screen.blit(text, text_rect)
 
     def drawXO(self):
@@ -92,28 +104,93 @@ class Graphics:
         if matrix_x is None or matrix_y is None:
             return
 
-        message = self.game.move(matrix_x, matrix_y)+" - "
+        message = self.game.move(matrix_x, matrix_y) + " - "
         if message == VALID_MOVE + " - ":
             message = ""
 
         self.draw_status(message + self.game.game_state)
         self.drawXO()
 
-    def game_loop(self):
-        self.game_initiating_window()
+    def game_loop(self, model_O=None, model_X=None):
+        self.model_O = model_O
+        self.model_X = model_X
 
-        while True:
-            for event in pg.event.get():
-                if event.type == QUIT:
-                    pg.quit()
-                    sys.exit()
-                if event.type == MOUSEBUTTONDOWN:
-                    if self.game.is_ending_state():
-                        self.reset()
+        def nn_ai_O():
+            self.ai = "neuralnetwork"
+            self.ai_player = O_PLAYING
+            if self.model_O is not None:
+                game()
+            else:
+                print("Error, must provide model")
 
-                    else:
-                        self.user_input()
-                        self.game.print_board()
+        def nn_ai_X():
+            self.ai = "neuralnetwork"
+            self.ai_player = X_PLAYING
+            if self.model_X is not None:
+                game()
+            else:
+                print("Error, must provide model")
 
-            pg.display.update()
-            CLOCK.tick(FPS)
+        def minmax_ai_O():
+            self.ai = "minimax"
+            self.ai_player = O_PLAYING
+            game()
+
+        def minmax_ai_X():
+            self.ai = "neuralnetwork"
+            self.ai_player = X_PLAYING
+            game()
+
+        def game():
+            self.game_initiating_window()
+
+            while True:
+                if self.ai_player == self.game.game_state:
+                    if self.ai == "minimax":
+                        best_move = Minimax.get_best_move(self.game)
+                        self.game.move(best_move[0], best_move[1])
+
+                    elif self.ai == "neuralnetwork":
+
+                        if self.game.game_state == O_PLAYING:
+                            best_move = Neuralnetwork.get_best_move(model_O, self.game)
+                        elif self.game.game_state == X_PLAYING:
+                            best_move = Neuralnetwork.get_best_move(model_X, self.game)
+                        else:
+                            break
+
+                        self.game.move(best_move[0], best_move[1])
+
+                for event in pg.event.get():
+                    if event.type == QUIT:
+                        pg.quit()
+                        sys.exit()
+                    if event.type == MOUSEBUTTONDOWN:
+                        if self.game.is_ending_state():
+                            self.reset()
+
+                        else:
+                            self.user_input()
+                            self.game.print_board()
+
+                pg.display.update()
+                CLOCK.tick(FPS)
+
+        # create menu
+        surface = create_example_window('TICTACTOE', (self.width, self.height))
+
+        self.menu = pygame_menu.Menu('TICTACTOE', self.width, self.height,
+                                     theme=pygame_menu.themes.THEME_ORANGE)
+        self.menu.add.label('TICTACTOE')
+        self.menu.add.button("X-PLAYER VS O-PLAYER", game)
+        self.menu.add.button("X-MINIMAX VS O-PLAYER", minmax_ai_X)
+        self.menu.add.button("O-MINIMAX VS X-PLAYER", minmax_ai_O)
+        self.menu.add.button("X-NEURALNET VS O-PLAYER", nn_ai_X)
+        self.menu.add.button("O-NEURALNET VS X-PLAYER", nn_ai_O)
+
+        self.menu.add.button('QUIT', pygame_menu.events.EXIT)
+        self.menu.add.label('--------------------------------------------------')
+        self.menu.add.label('|          Author: Oliver Morgan          |')
+        self.menu.add.label("")
+
+        self.menu.mainloop(surface)
