@@ -74,8 +74,8 @@ class Graphics:
 
         text = font.render(message, True, (255, 255, 255))
 
-        self.screen.fill((0, 0, 0), (0, self.width, self.height+100, 100))
-        text_rect = text.get_rect(center=(self.width / 2, self.height - 50))
+        self.screen.fill((0, 0, 0), (0, self.width, self.height + 100, self.height))
+        text_rect = text.get_rect(center=(self.width / 2, self.height + 50))
         self.screen.blit(text, text_rect)
 
     def drawXO(self):
@@ -108,8 +108,8 @@ class Graphics:
         if message == VALID_MOVE + " - ":
             message = ""
 
-        self.draw_status(message + self.game.game_state)
         self.drawXO()
+        self.draw_status(message + self.game.game_state)
 
     def game_loop(self, model_O=None, model_X=None):
         self.model_O = model_O
@@ -137,21 +137,22 @@ class Graphics:
             game()
 
         def minmax_ai_X():
-            self.ai = "neuralnetwork"
+            self.ai = "minimax"
             self.ai_player = X_PLAYING
             game()
 
         def game():
-            self.game_initiating_window()
+            self.reset()
 
             while True:
                 if self.ai_player == self.game.game_state:
                     if self.ai == "minimax":
                         best_move = Minimax.get_best_move(self.game)
-                        self.game.move(best_move[0], best_move[1])
+                        message = self.game.move(best_move[0], best_move[1])
+                        self.drawXO()
+                        self.draw_status(message + " " + self.game.game_state)
 
                     elif self.ai == "neuralnetwork":
-
                         if self.game.game_state == O_PLAYING:
                             best_move = Neuralnetwork.get_best_move(model_O, self.game)
                         elif self.game.game_state == X_PLAYING:
@@ -159,7 +160,9 @@ class Graphics:
                         else:
                             break
 
-                        self.game.move(best_move[0], best_move[1])
+                        message = self.game.move(best_move[0], best_move[1])
+                        self.drawXO()
+                        self.draw_status(message + " " + self.game.game_state)
 
                 for event in pg.event.get():
                     if event.type == QUIT:
@@ -181,16 +184,14 @@ class Graphics:
 
         self.menu = pygame_menu.Menu('TICTACTOE', self.width, self.height,
                                      theme=pygame_menu.themes.THEME_ORANGE)
-        self.menu.add.label('TICTACTOE')
+        self.menu.add.label('\nTICTACTOE\n---')
         self.menu.add.button("X-PLAYER VS O-PLAYER", game)
         self.menu.add.button("X-MINIMAX VS O-PLAYER", minmax_ai_X)
         self.menu.add.button("O-MINIMAX VS X-PLAYER", minmax_ai_O)
         self.menu.add.button("X-NEURALNET VS O-PLAYER", nn_ai_X)
         self.menu.add.button("O-NEURALNET VS X-PLAYER", nn_ai_O)
-
-        self.menu.add.button('QUIT', pygame_menu.events.EXIT)
-        self.menu.add.label('--------------------------------------------------')
-        self.menu.add.label('|          Author: Oliver Morgan          |')
+        self.menu.add.label('---')
+        self.menu.add.label('           Author: Oliver Morgan           ')
         self.menu.add.label("")
 
         self.menu.mainloop(surface)
