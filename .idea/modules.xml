@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/UI_TickTackToe.iml" filepath="$PROJECT_DIR$/.idea/UI_TickTackToe.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../TICTACTOE_NEURALNETWORK/.idea/TICTACTOE_NEURALNETWORK.iml" filepath="$PROJECT_DIR$/../TICTACTOE_NEURALNETWORK/.idea/TICTACTOE_NEURALNETWORK.iml" />
     </modules>
   </component>
 </project>
