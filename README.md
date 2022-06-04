@@ -35,7 +35,7 @@ To get the necessary libraries run
     
     The neural network model is trained 300 epochs by batches of 32. I used categorical crossentropy as my loss function since my model is a multi-class classification one.   
     
-    ![Trianing Graph](https://github.com/atOliverParkerMorgan/TicTacToe-neuralnetwork/blob/master/training_visual.png?raw=true)
+    ![Trianing Graph](https://github.com/atOliverParkerMorgan/TicTacToe-neuralnetwork/raw/master/assets/training_visual.png?raw=true)
 ## Screenshots
 ![Screenshot 1](https://github.com/atOliverParkerMorgan/TicTacToe-neuralnetwork/blob/master/screenshots/Screenshot%20from%202022-06-04%2016-25-30.png?raw=true)
 
