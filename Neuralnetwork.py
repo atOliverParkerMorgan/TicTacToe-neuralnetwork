@@ -93,7 +93,7 @@ def train(model, train_data_file, epochs, batch_size):
 
     # plot
     metrics = [k for k in training.history.keys() if ("loss" not in k) and ("val" not in k)]
-    fig, ax = plt.subplots(nrows=1, ncols=2, sharey="True", figsize=(15, 3))
+    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 3))
 
     # training
     ax[0].set(title="Training")
@@ -148,7 +148,7 @@ def generate_model(number_of_inputs, number_of_nodes_in_layers, number_of_output
 
     last_layer = inputs
     for i, number_of_nodes in enumerate(number_of_nodes_in_layers):
-        # hidden layer 1
+        # hidden layer i
         current_layer = layers.Dense(name=f"h{i}", units=number_of_nodes, activation='relu')(last_layer)
         current_layer = layers.Dropout(name=f"drop{i}", rate=0.2)(current_layer)
         last_layer = current_layer
@@ -172,7 +172,7 @@ def utils_nn_config(model):
                          "out": int(layer.output.shape[-1]), "activation": layer.get_config()["activation"],
                          "params": layer.get_weights()[0], "bias": layer.get_weights()[1]}
 
-        except ValueError:
+        except:
             dic_layer = {"name": layer.name, "in": int(layer.input.shape[-1]), "neurons": 0,
                          "out": int(layer.output.shape[-1]), "activation": None,
                          "params": 0, "bias": 0}

@@ -70,12 +70,12 @@ if __name__ == "__main__":
     # play(current_game, 'neuralnetwork')
 
     # play with UI
-    graphics = Graphics(600, 600)
-    graphics.game_loop(model_O, model_X)
+    # graphics = Graphics(600, 600)
+    # graphics.game_loop(model_O, model_X)
 
     # train neural network
-    # train_and_save_model("./X_model/", "X_training_data.txt")
-    # train_and_save_model("./O_model/", "O_training_data.txt")
+    Neuralnetwork.train_and_save_model("./X_model/", "X_training_data.txt")
+    # Neuralnetwork.train_and_save_model("./O_model/", "O_training_data.txt")
 
     # generate training data
     # generate_training_data(20_000, True, "w")
