@@ -1,7 +1,7 @@
 
 # TICTACTOE NEURAL NETWORK
 
-a project with a neural network that can play tictactoe
+a neural network that can play tictactoe
 
 
 
