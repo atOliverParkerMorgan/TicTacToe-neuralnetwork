@@ -43,9 +43,9 @@ def get_random_game_state_and_next_best_move(is_O):
 
 
 def generate_training_data(size, is_O, command):
-    name = "X_training_data.txt"
+    name = "./training_data/X_training_data.txt"
     if is_O:
-        name = "O_training_data.txt"
+        name = "./training_data/O_training_data.txt"
 
     if not (command == "a" or command == "w"):
         print("Error, command can only be 'w' or 'a' ")

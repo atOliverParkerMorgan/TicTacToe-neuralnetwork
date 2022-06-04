@@ -74,8 +74,8 @@ if __name__ == "__main__":
     graphics.game_loop(model_O, model_X)
 
     # train neural network
-    # Neuralnetwork.train_and_save_model("./X_model/", "X_training_data.txt")
-    # Neuralnetwork.train_and_save_model("./O_model/", "O_training_data.txt")
+    # Neuralnetwork.train_and_save_model("./X_model/", "./training_data/X_training_data.txt")
+    # Neuralnetwork.train_and_save_model("./O_model/", "./training_data/O_training_data.txt")
 
     # generate training data
     # generate_training_data(20_000, True, "w")

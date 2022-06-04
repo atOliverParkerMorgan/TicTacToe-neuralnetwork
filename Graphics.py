@@ -29,9 +29,9 @@ class Graphics:
         self.screen = pg.display.set_mode((width, height + 100), 0, 32)
 
         # loading the images as python object
-        initiating_window = pg.image.load("modified_cover.png")
-        x_img = pg.image.load("X.png")
-        o_img = pg.image.load("o.png")
+        initiating_window = pg.image.load("assets/modified_cover.png")
+        x_img = pg.image.load("assets/X.png")
+        o_img = pg.image.load("assets/o.png")
 
         # resizing images
         self.initiating_window = pg.transform.scale(initiating_window, (width, height + 100))

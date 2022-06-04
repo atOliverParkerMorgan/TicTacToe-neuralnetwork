@@ -30,10 +30,20 @@ To get the necessary libraries run
     In this project I used [keras](https://keras.io/) to create a neural network model
     which I then trained on a data set created by my minimax algorithm. The neural has
     nine inputs and outputs it also has three hidden layers. 
+    
     ![Neural network model](https://github.com/Olix03/TicTacToe/blob/master/model_visual.png?raw=true)
+    
     The neural network model is trained 300 epochs by batches of 32. I used categorical crossentropy as my loss function since my model is a multi-class classification one.   
+    
     ![Trianing Graph](https://github.com/atOliverParkerMorgan/TicTacToe-neuralnetwork/blob/master/training_visual.png?raw=true)
-## Authors
+## Screenshots
+![Screenshot 1](https://github.com/atOliverParkerMorgan/TicTacToe-neuralnetwork/blob/master/screenshots/Screenshot%20from%202022-06-04%2016-25-30.png?raw=true)
 
-- [@Olix03](https://github.com/Olix03)
+![Screenshot 2](https://github.com/atOliverParkerMorgan/TicTacToe-neuralnetwork/blob/master/screenshots/Screenshot%20from%202022-06-04%2016-25-33.png?raw=true)
+
+![Screenshot 3](https://github.com/atOliverParkerMorgan/TicTacToe-neuralnetwork/blob/master/screenshots/Screenshot%20from%202022-06-04%2016-26-25.png?raw=true)
+
+## Author
+
+- [Oliver Morgan](https://github.com/atOliverParkerMorgan)
 
